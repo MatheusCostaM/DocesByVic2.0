@@ -45,23 +45,23 @@ public class Menu {
 
             switch (opcao){
                 case 1:
-                    adicionarCliente();
+                    addClient();
                     break;
                 case 2:
-                    adicionarProduto();
+                    addProduct();
                     break;
                 case 3:
-                    adicionarPromotion();
+                    addPromotion();
                     break;
                 case 4:
-                    realizarCompra();
+                    makePurchase();
                     break;
                 case 5:
-                    var client = informacoesCliente();
+                    var client = infoClient();
                     client.getInfo();
                     break;
                 case 6:
-                    var product = informacoesProduto();
+                    var product = infoProduct();
                     product.getInfo();
                     break;
                 case 0:
@@ -75,11 +75,34 @@ public class Menu {
 
     }
 
-    public void adicionarPromotion(){
+    public void addPromotion(){
+
+        //String name, Double value, Double newValue,Integer regra
+
+        System.out.println("Digite o Nome da Promoção");
+        var name = read.nextLine();
+
+        System.out.println("Digite o Valor dos Produtos Elegiveis");
+        var value = read.nextDouble();
+        read.nextLine();
+
+        System.out.println("Digite o Valor dos Produtos com Desconto");
+        var newValue = read.nextDouble();
+        read.nextLine();
+
+        System.out.println("Digite Quantos Produtos tem Que ser Vendidos para Entrar na Promoção");
+        var rule = read.nextInt();
+        read.nextLine();
+
+        Promotion promotion = new Promotion(name,value,newValue,rule);
+        this.promotionList.add(promotion);
+
+        System.out.println("Lista de Promoções Atualizada");
+        System.out.println(this.promotionList);
 
     }
 
-    public void adicionarCliente(){
+    public void addClient(){
 
         System.out.println("Digite o Nome do Cliente");
         var nome = read.nextLine();
@@ -95,19 +118,19 @@ public class Menu {
 
     }
 
-    public void adicionarProduto(){
+    public void addProduct(){
 
         System.out.println("Digite o Tipo do Produto");
-        var tipo = read.nextLine();
+        var type = read.nextLine();
 
         System.out.println("Digite o Sabor do Produto");
-        var sabor = read.nextLine();
+        var taste = read.nextLine();
 
         System.out.println("Digite o Valor do Produto");
-        var valor = read.nextDouble();
+        var value = read.nextDouble();
         read.nextLine();
 
-        Product product = new Product(tipo,sabor,valor);
+        Product product = new Product(type,taste,value);
         this.productList.add(product);
 
         System.out.println("Lista de Produtos Atualizada");
@@ -115,20 +138,20 @@ public class Menu {
 
     }
 
-    public void realizarCompra(){
+    public void makePurchase(){
 
-        var escolha = -1;
+        var choice = -1;
         List<Sell> sells = new ArrayList<>();
 
-        var client = informacoesCliente();
+        var client = infoClient();
         System.out.println(client);
 
         System.out.println("Qual a data de hoje?");
         var date = read.nextLine();
 
-        while(escolha != 0){
+        while(choice != 0){
 
-            var product = informacoesProduto();
+            var product = infoProduct();
             System.out.println(product);
 
             System.out.println("Quantos?");
@@ -145,43 +168,43 @@ public class Menu {
                        [1] Continuar Compra
                             """
             ));
-            escolha = read.nextInt();
+            choice = read.nextInt();
             read.nextLine();
         }
 
-        CompleteSell completeSell = new CompleteSell(sells,date,client,promotionList);
-        client.addCompra(completeSell);
+        CompleteSell fullSell = new CompleteSell(sells,date,client,promotionList);
+        client.addCompra(fullSell);
 
-        System.out.println(completeSell);
+        System.out.println(fullSell);
     }
 
-    public Cliente informacoesCliente(){
+    public Cliente infoClient(){
         System.out.println("Lista de Clientes Escolha um e digite seu nome");
         System.out.println(this.clienteList);
-        var clientname = read.nextLine();
+        var clientName = read.nextLine();
         var client = this.clienteList.stream()
-                .filter(c -> c.getName().equalsIgnoreCase(clientname))
+                .filter(c -> c.getName().equalsIgnoreCase(clientName))
                 .findFirst()
                 .orElse(null);
 
         return client;
     }
 
-    public Product informacoesProduto(){
+    public Product infoProduct(){
         System.out.println("Lista de tipos Produtos Escolha um e digite o tipo");
         this.productList.forEach(p -> System.out.println(p.getTipe()));
-        var producttipename = read.nextLine();
+        var productTypeName = read.nextLine();
 
         System.out.println("Lista de sabores Escolha um e digite o sabor");
         this.productList.stream()
-                .filter(p -> p.getTipe().equalsIgnoreCase(producttipename))
+                .filter(p -> p.getTipe().equalsIgnoreCase(productTypeName))
                 .distinct()
                 .forEach(p -> System.out.println(p.getSabor()));
-        var productsaborname = read.nextLine();
+        var productTasteName = read.nextLine();
 
         var product = this.productList.stream()
-                .filter(p -> p.getTipe().equalsIgnoreCase(producttipename))
-                .filter(p -> p.getSabor().equalsIgnoreCase(productsaborname))
+                .filter(p -> p.getTipe().equalsIgnoreCase(productTypeName))
+                .filter(p -> p.getSabor().equalsIgnoreCase(productTasteName))
                 .findFirst()
                 .orElse(null);
 
