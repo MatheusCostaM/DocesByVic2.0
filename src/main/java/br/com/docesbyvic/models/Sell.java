@@ -4,10 +4,26 @@ import java.time.format.DateTimeFormatter;
 
 import static java.lang.String.format;
 
+import jakarta.persistence.*;
+
+@Entity
 public class Sell {
-    private Product product;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private Integer quantity;
+
     private Double value;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Product product;
+
+    @ManyToOne
+    private CompleteSell completeSell;
+
+    public Sell() {}
 
     public Sell(Product product, Integer quantity) {
         this.product = product;
@@ -17,6 +33,10 @@ public class Sell {
 
     protected Double calculateValue(){
         return this.product.getValue() * this.quantity;
+    }
+
+    public void setCompleteSell(CompleteSell completeSell) {
+        this.completeSell = completeSell;
     }
 
     protected void setValue() {

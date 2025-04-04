@@ -1,9 +1,26 @@
 package br.com.docesbyvic.models;
 
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+@Entity
 public class Product {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
     private String tipe;
+
     private String sabor;
+
     private Double value;
+
+
+    public Product(){}
 
     public Product(String tipe,String sabor, Double value) {
         this.tipe = tipe;

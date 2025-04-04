@@ -1,14 +1,29 @@
 package br.com.docesbyvic.models;
 
+import jakarta.persistence.*;
+
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+
+@Entity
 public class CompleteSell {
-    private List<Sell> sellList = new ArrayList<>();
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
     private String date;
+
+    @ManyToOne
     private Cliente cliente;
+
     private Double value;
+
+    @OneToMany(mappedBy = "completeSell", cascade = CascadeType.ALL)
+    private List<Sell> sellList = new ArrayList<>();
+
+    public CompleteSell() {}
 
     public CompleteSell(List<Sell> sellList, String date, Cliente cliente, List<Promotion> promotionList) {
         this.sellList = sellList;
@@ -17,6 +32,8 @@ public class CompleteSell {
         aplicarPromotion(promotionList);
         calculateValue();
         setDividaCliente();
+
+        this.sellList.forEach(sell -> sell.setCompleteSell(this));
     }
 
     public void aplicarPromotion(List<Promotion> promotionList){

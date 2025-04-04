@@ -1,13 +1,26 @@
 package br.com.docesbyvic.models;
 
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
 public class Cliente {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String name;
+
     private String phone;
+
     private Double divida;
+
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
     private List<CompleteSell> comprasList = new ArrayList<>();
+
+    public Cliente() {}
 
     public Cliente(String name, String phone) {
         this.name = name;
@@ -27,9 +40,11 @@ public class Cliente {
         return comprasList;
     }
 
-    public void addCompra(CompleteSell compra){
+    public void addCompra(CompleteSell compra) {
         this.comprasList.add(compra);
+        compra.setCliente(this);
     }
+
 
     public String getName() {
         return name;

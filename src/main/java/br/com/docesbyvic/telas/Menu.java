@@ -33,9 +33,6 @@ public class Menu {
 
     public void displayMenu(){
 
-        Promotion promotion = new Promotion("2 por 16",10.0,8.0,2);
-        promotionList.add(promotion);
-
         while(this.getOpcao() != 0){
 
             System.out.println(this.texto);
