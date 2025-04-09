@@ -1,210 +1,171 @@
 package br.com.docesbyvic.telas;
 
 import br.com.docesbyvic.models.*;
+import br.com.docesbyvic.services.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+@Component
 public class Menu {
 
-    private List<Cliente> clienteList = new ArrayList<>();
-    private List<Product> productList = new ArrayList<>();
-    private List<Promotion> promotionList = new ArrayList<>();
+    @Autowired
+    private ClientService clientService;
+    @Autowired
+    private ProductService productService;
+    @Autowired
+    private PromotionService promotionService;
+    @Autowired
+    private CompleteSellService completeSellService;
 
-    private Integer opcao = -1;
-    private String texto = """
-            [1] Adicionar Cliente
-            [2] Adicionar Produto
-            [3] Adicionar Promoção
-            [4] Realizar Compra
-            [5] Informações Cliente
-            [6] Informações Produto
-            """;
-    final Scanner read = new Scanner(System.in);
+    private final Scanner read = new Scanner(System.in);
 
-    public Integer getOpcao() {
-        return opcao;
-    }
+    public void displayMenu() {
+        int opcao = -1;
+        while (opcao != 0) {
+            System.out.println("""
+                [1] Adicionar Cliente
+                [2] Adicionar Produto
+                [3] Adicionar Promoção
+                [4] Realizar Compra
+                [5] Listar Clientes
+                [6] Listar Produtos
+                [0] Sair
+                """);
 
-    public void setOpcao(Integer opcao) {
-        this.opcao = opcao;
-    }
-
-    public void displayMenu(){
-
-        while(this.getOpcao() != 0){
-
-            System.out.println(this.texto);
-            setOpcao(read.nextInt());
+            opcao = read.nextInt();
             read.nextLine();
 
-
-            switch (opcao){
-                case 1:
-                    addClient();
-                    break;
-                case 2:
-                    addProduct();
-                    break;
-                case 3:
-                    addPromotion();
-                    break;
-                case 4:
-                    makePurchase();
-                    break;
-                case 5:
-                    var client = infoClient();
-                    client.getInfo();
-                    break;
-                case 6:
-                    var product = infoProduct();
-                    product.getInfo();
-                    break;
-                case 0:
-                    break;
-                default:
-                    System.out.println("Opção invalida, tente novamente");
-                    break;
+            switch (opcao) {
+                case 1 -> addClient();
+                case 2 -> addProduct();
+                case 3 -> addPromotion();
+                case 4 -> makePurchase();
+                case 5 -> showClients();
+                case 6 -> showProducts();
+                case 0 -> System.out.println("Saindo...");
+                default -> System.out.println("Opção inválida!");
             }
-
         }
-
     }
 
-    public void addPromotion(){
+    private void addClient() {
+        System.out.println("Nome do Cliente:");
+        String name = read.nextLine();
 
-        //String name, Double value, Double newValue,Integer regra
+        System.out.println("Telefone do Cliente:");
+        String phone = read.nextLine();
 
-        System.out.println("Digite o Nome da Promoção");
+        Client client = new Client(name, phone);
+
+        System.out.println(client);
+        clientService.createClient(client); // correto
+        System.out.println("Cliente salvo com sucesso!");
+    }
+
+    private void addProduct() {
+        System.out.println("Tipo do Produto:");
+        String type = read.nextLine();
+
+        System.out.println("Sabor do Produto:");
+        String taste = read.nextLine();
+
+        System.out.println("Valor do Produto:");
+        Double value = read.nextDouble();
+        read.nextLine();
+
+        Product product = new Product(type, taste, value);
+        productService.saveProduct(product); // correto
+        System.out.println("Produto salvo com sucesso!");
+    }
+
+    private void addPromotion() {
+
+        System.out.println("Nome da Promoção");
         var name = read.nextLine();
 
-        System.out.println("Digite o Valor dos Produtos Elegiveis");
+        System.out.println("Valor dos Produtos Elegiveis:");
         var value = read.nextDouble();
         read.nextLine();
 
-        System.out.println("Digite o Valor dos Produtos com Desconto");
+        System.out.println("Valor Promocional:");
         var newValue = read.nextDouble();
         read.nextLine();
 
-        System.out.println("Digite Quantos Produtos tem Que ser Vendidos para Entrar na Promoção");
+        System.out.println("Quantidade de Produtos:");
         var rule = read.nextInt();
         read.nextLine();
 
-        Promotion promotion = new Promotion(name,value,newValue,rule);
-        this.promotionList.add(promotion);
-
-        System.out.println("Lista de Promoções Atualizada");
-        System.out.println(this.promotionList);
+        Promotion promotion = new Promotion(name, value, newValue,rule);
+        promotionService.savePromotion(promotion);
+        System.out.println(promotion);
 
     }
 
-    public void addClient(){
+    private void makePurchase() {
 
-        System.out.println("Digite o Nome do Cliente");
-        var nome = read.nextLine();
+        var escolha = 1;
+        List<Sell> shop = new ArrayList<>();
 
-        System.out.println("Digite o Telefone do Cliente");
-        var phone = read.nextLine();
-
-        Cliente cliente = new Cliente(nome,phone);
-        this.clienteList.add(cliente);
-
-        System.out.println("Lista de Clientes Atualizada");
-        System.out.println(this.clienteList);
-
-    }
-
-    public void addProduct(){
-
-        System.out.println("Digite o Tipo do Produto");
-        var type = read.nextLine();
-
-        System.out.println("Digite o Sabor do Produto");
-        var taste = read.nextLine();
-
-        System.out.println("Digite o Valor do Produto");
-        var value = read.nextDouble();
+        System.out.println("Quem é o cliente? (Digite o Numero)");
+        showClients();
+        var idClient = read.nextLong();
         read.nextLine();
+        Client client = clientService.getClientById(idClient);
 
-        Product product = new Product(type,taste,value);
-        this.productList.add(product);
-
-        System.out.println("Lista de Produtos Atualizada");
-        System.out.println(this.productList);
-
-    }
-
-    public void makePurchase(){
-
-        var choice = -1;
-        List<Sell> sells = new ArrayList<>();
-
-        var client = infoClient();
-        System.out.println(client);
-
-        System.out.println("Qual a data de hoje?");
+        System.out.println("Qual é a data de hoje?");
         var date = read.nextLine();
 
-        while(choice != 0){
+        while (escolha != 0) {
 
-            var product = infoProduct();
-            System.out.println(product);
+            System.out.println("Qual é o produto? (Digite o Numero)");
+            showProducts();
+            var idProduct = read.nextLong();
+            read.nextLine();
+            Product product = productService.getProductById(idProduct);
 
-            System.out.println("Quantos?");
+            System.out.println("Quantos produtos?");
             var quantity = read.nextInt();
             read.nextLine();
 
             Sell sell = new Sell(product,quantity);
+            shop.add(sell);
 
-            sells.add(sell);
-
-            System.out.println(String.format(
-                    """
-                       [0] Finalizar Compra
-                       [1] Continuar Compra
-                            """
-            ));
-            choice = read.nextInt();
+            System.out.println("[0] Finalizar compra \n [1] Continuar compra");
+            escolha = read.nextInt();
             read.nextLine();
+
         }
 
-        CompleteSell fullSell = new CompleteSell(sells,date,client,promotionList);
-        client.addCompra(fullSell);
+        var promotionList = promotionService.getAllPromotions();
 
-        System.out.println(fullSell);
+        CompleteSell completeSell = new CompleteSell(shop,date,client,promotionList);
+        client.setDebt(completeSell.getValue());
+        clientService.updateClient(idClient,client);
+        System.out.println(completeSell);
+        completeSellService.save(completeSell);
+
     }
 
-    public Cliente infoClient(){
-        System.out.println("Lista de Clientes Escolha um e digite seu nome");
-        System.out.println(this.clienteList);
-        var clientName = read.nextLine();
-        var client = this.clienteList.stream()
-                .filter(c -> c.getName().equalsIgnoreCase(clientName))
-                .findFirst()
-                .orElse(null);
+    private void showClients() {
+        List<Client> clients = clientService.getAllClients();
 
-        return client;
+        if (clients.isEmpty()) {
+            System.out.println("Nenhum cliente encontrado.");
+        } else {
+            for (Client client : clients) {
+                System.out.println(client);
+            }
+        }
     }
 
-    public Product infoProduct(){
-        System.out.println("Lista de tipos Produtos Escolha um e digite o tipo");
-        this.productList.forEach(p -> System.out.println(p.getTipe()));
-        var productTypeName = read.nextLine();
-
-        System.out.println("Lista de sabores Escolha um e digite o sabor");
-        this.productList.stream()
-                .filter(p -> p.getTipe().equalsIgnoreCase(productTypeName))
-                .distinct()
-                .forEach(p -> System.out.println(p.getSabor()));
-        var productTasteName = read.nextLine();
-
-        var product = this.productList.stream()
-                .filter(p -> p.getTipe().equalsIgnoreCase(productTypeName))
-                .filter(p -> p.getSabor().equalsIgnoreCase(productTasteName))
-                .findFirst()
-                .orElse(null);
-
-        return product;
+    private void showProducts() {
+        List<Product> products = productService.getAllProducts(); // correto
+        for (Product product : products) {
+            System.out.println(product);
+        }
     }
 }

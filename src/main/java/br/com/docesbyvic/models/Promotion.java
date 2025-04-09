@@ -1,10 +1,6 @@
 package br.com.docesbyvic.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
+import jakarta.persistence.*;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,17 +25,17 @@ public class Promotion {
         this.regra = regra;
     }
 
-    public Boolean promotionValue(List<Sell> sells) {
+    // Lógica da promoção (verifica e aplica se puder)
+    public Boolean applyPromotionIfEligible(List<Sell> sells) {
         List<Sell> promotionSells = sells.stream()
                 .filter(e -> Objects.equals(e.getProduct().getValue(), this.value))
-                .peek(System.out::println)
                 .toList();
 
         int productsPromotion = promotionSells.stream()
                 .mapToInt(Sell::getQuantity)
                 .sum();
 
-        if (productsPromotion >= 2) {
+        if (productsPromotion >= this.regra) {
             promotionSells.forEach(s -> s.setValue(this.newValue));
             return true;
         } else {
@@ -47,6 +43,7 @@ public class Promotion {
         }
     }
 
+    // Getters e Setters
     public Long getId() {
         return id;
     }
@@ -59,28 +56,28 @@ public class Promotion {
         return name;
     }
 
-    public Double getValue() {
-        return value;
-    }
-
-    public Double getNewValue() {
-        return newValue;
-    }
-
-    public Integer getRegra() {
-        return regra;
-    }
-
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Double getValue() {
+        return value;
     }
 
     public void setValue(Double value) {
         this.value = value;
     }
 
+    public Double getNewValue() {
+        return newValue;
+    }
+
     public void setNewValue(Double newValue) {
         this.newValue = newValue;
+    }
+
+    public Integer getRegra() {
+        return regra;
     }
 
     public void setRegra(Integer regra) {
@@ -89,6 +86,7 @@ public class Promotion {
 
     @Override
     public String toString() {
-        return String.format("Promoção: %s | De %.2f por %.2f | Regra: %d", name, value, newValue, regra);
+        return String.format("Promotion: %s | From: %.2f To: %.2f | Rule: %d",
+                this.name, this.value, this.newValue, this.regra);
     }
 }

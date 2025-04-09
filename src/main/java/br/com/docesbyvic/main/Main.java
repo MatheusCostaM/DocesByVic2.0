@@ -1,20 +1,16 @@
 package br.com.docesbyvic.main;
 
-import br.com.docesbyvic.models.Cliente;
-//import br.com.docesbyvic.models.Promotion;
-import br.com.docesbyvic.models.CompleteSell;
-import br.com.docesbyvic.models.Product;
-import br.com.docesbyvic.models.Sell;
 import br.com.docesbyvic.telas.Menu;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class Main {
 
-    public String nome ="dsad";
+    @Autowired
+    private Menu menu; // Spring vai injetar
 
-    public void display(){
-
-        Menu menu = new Menu();
-
+    public void display() {
         menu.displayMenu();
     }
 }
